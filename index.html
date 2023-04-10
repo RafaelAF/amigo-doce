@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href='https://unpkg.com/css.gg@2.0.0/icons/css/close.css' rel='stylesheet'>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+        body{
+            position: relative;
+            padding: 20px;
+
+
+        }
+        ul{
+            list-style: none;
+        }
+        li{
+            font-size: 2vw;
+        }
+        .amigo-doce{
+            background-color: rgb(167, 190, 190);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 30px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+        }
+        .form-data{
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+        .input{
+            font-size: 1.5rem;
+            border-radius: 5px;
+            border: none;
+            margin-right: 10px;
+            padding: 5px;
+            outline: none;
+        }
+        .btn{
+            font-size: 1rem;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .container-modal-opened{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        .container-modal-closed{
+            display: none;
+        }
+        .modal{
+            width: 80%;
+            
+
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .modal-head{
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 800px) {
+            li{
+                font-size: 4vw;
+            }
+            .form-data{
+                flex-direction: column;
+                margin: 0 auto;
+                
+            }
+            .input{
+                margin-bottom: 20px;
+            }
+        }
+        @media (max-width: 425px) {
+            li{
+                font-size: 8vw;
+            }
+            .input{
+                max-width: 80%;
+            }
+            .lista_grupos li{
+                font-size: 4vw;
+            }
+            .btn{
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="amigo-doce">
+        <h1>Amigo doce</h1>
+        <p>numero de pessoas</p><span id="num_pessoas">0</span> <br>
+        <div class="form-data">
+            <input type="text" id="nome" class="input">
+            <button id="btn_nome" class="btn">Adicionar nome</button>
+        </div>
+    </div>
+    <div id="Lista-container">
+        <h1>Lista de pessoas</h1>
+        <button id="sortear" class="btn">Sortear</button>
+        <ul id="lista">
+
+        </ul>
+    </div>
+    <div id="grupos-modal" class="container-modal-closed">
+        <div class="modal">
+
+            <div class="modal-head"><h1>Grupos</h1><i id="close_modal" class="gg-close"></i></div>
+            <ul id="lista_grupos" class="lista_grupos">
+    
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let nome = document.getElementById('nome');
+        let btn = document.getElementById('btn_nome');
+        let lista = document.getElementById('lista');
+        let numero_pessoas = document.getElementById('num_pessoas')
+        let pessoas = []
+        let pessoasSorteio = pessoas
+        let btnSorteio = document.getElementById('sortear')
+        let pessoasEscolhidas = []
+        let modal = document.getElementById('grupos-modal')
+        let grupos = document.getElementById('lista_grupos')
+
+        let closeBtn = document.getElementById('close_modal')
+
+        function sortearAmigoSecreto() {
+                    // Cria um array vazio para armazenar os resultados do sorteio
+                    let sorteio = [];
+
+                    // Cria uma cópia da lista de participantes para usar no sorteio
+                    let participantesSorteados = pessoas.slice();
+
+                    // Percorre a lista de participantes
+                    for (let i = 0; i < pessoas.length; i++) {
+                        // Sorteia um índice aleatório da lista de participantes restantes
+                        let indice = Math.floor(Math.random() * participantesSorteados.length);
+
+                        // Se o índice sorteado for o índice do participante atual, sorteia novamente
+                        while (participantesSorteados[indice] === pessoas[i]) {
+                            indice = Math.floor(Math.random() * participantesSorteados.length);
+                        }
+
+                        // Armazena o nome do Amigo Secreto correspondente ao índice sorteado
+                        let amigoSecreto = participantesSorteados[indice];
+
+                        // Remove o nome do Amigo Secreto da lista de participantes restantes
+                        participantesSorteados.splice(indice, 1);
+
+                        // Armazena o nome do participante e do seu Amigo Secreto em um array
+                        let resultado = [pessoas[i], amigoSecreto];
+
+                        // Adiciona o array com os resultados do sorteio ao array de resultados
+                        sorteio.push(resultado);
+                    }
+
+                    // Retorna o array de resultados do sorteio
+                    return sorteio;
+                }
+
+        
+        
+        btn.addEventListener('click', () => {
+            if (nome.value != '') {
+                pessoas.push(nome.value)
+            }
+            lista.innerHTML = ''
+            numero_pessoas.innerHTML = pessoas.length
+            pessoas.forEach((pessoa) => {
+                let pessoaItem = document.createElement('li')
+                pessoaItem.innerHTML = pessoa
+
+                lista.appendChild(pessoaItem)
+
+                console.log(pessoa)
+            })
+            nome.value = ''
+        })
+
+        // Função de sortear
+        btnSorteio.addEventListener('click', () => {
+            if ((pessoas.length % 2) == 0 && pessoas.length != 0) {
+                let gruposEscolhidos = sortearAmigoSecreto()
+                grupos.innerHTML = ''
+                modal.classList.remove('container-modal-closed')
+                modal.classList.add('container-modal-opened')
+                gruposEscolhidos.forEach((e)=>{
+                    let grupoHTML = document.createElement('li')
+                    grupoHTML.innerHTML = `${e[0]} tirou ${e[1]}`
+                    grupos.appendChild(grupoHTML)
+                })
+                // console.log(gruposEscolhidos)
+            }
+            
+        })
+
+        closeBtn.addEventListener('click',()=>{
+            modal.classList.remove('container-modal-opened')
+            modal.classList.add('container-modal-closed')
+        })
+    </script>
+</body>
+
+</html>
